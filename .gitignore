@@ -1,0 +1,8 @@
+.env
+.streamlit/secrets.toml
+.venv/
+__pycache__/
+*.pyc
+*.swp
+data/.refresh.lock
+data/refresh_state.json
