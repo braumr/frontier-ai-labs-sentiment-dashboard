@@ -44,11 +44,11 @@ st.markdown(
     """
     <style>
         .stApp {
-            background: #0B1020;
+            background: #000000;
             color: #E5E7EB;
         }
         header[data-testid="stHeader"] {
-            background: #0B1020;
+            background: #000000;
             border-bottom: 1px solid #26334D;
         }
         header[data-testid="stHeader"] button,
@@ -56,13 +56,16 @@ st.markdown(
         [data-testid="stDecoration"],
         [data-testid="stStatusWidget"] {
             color: #E5E7EB;
-            background: #0B1020;
+            background: #000000;
         }
         [data-testid="stToolbar"] {
-            background: #0B1020;
+            background: #000000;
         }
         .block-container {padding-top: 2rem; padding-bottom: 3rem;}
-        h1, h2, h3, h4, h5, h6, p, li, span, label {
+        h1, h2, h3, h4, h5, h6 {
+            color: #FFFFFF;
+        }
+        p, li, span, label {
             color: #E5E7EB;
         }
         div[data-testid="stMarkdownContainer"] p,
@@ -203,10 +206,10 @@ def filter_tracked_company_rows(df: pd.DataFrame, column: str) -> pd.DataFrame:
 def apply_dark_chart_theme(fig: go.Figure) -> go.Figure:
     """Apply the dashboard color system to Plotly figures."""
     fig.update_layout(
-        paper_bgcolor="#0B1020",
-        plot_bgcolor="#0B1020",
+        paper_bgcolor="#000000",
+        plot_bgcolor="#000000",
         font={"color": "#E5E7EB"},
-        title_font={"color": "#E5E7EB"},
+        title_font={"color": "#FFFFFF"},
         legend={"font": {"color": "#E5E7EB"}},
         xaxis={
             "gridcolor": "#26334D",
