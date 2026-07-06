@@ -62,8 +62,9 @@ st.markdown(
             background: #000000;
         }
         .block-container {padding-top: 2rem; padding-bottom: 3rem;}
-        h1, h2, h3, h4, h5, h6 {
-            color: #FFFFFF;
+        h1, h2, h3, h4, h5, h6,
+        h1 *, h2 *, h3 *, h4 *, h5 *, h6 * {
+            color: #FFFFFF !important;
         }
         p, li, span, label {
             color: #E5E7EB;
