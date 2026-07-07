@@ -23,12 +23,12 @@ PREDICTION_FILES = [
     DATA_DIR / "prediction_results_actual_vs_feedforward_nn.csv",
 ]
 
-BLUE_PALETTE = ["#0B3D91", "#1557B0", "#1F77D0", "#4A90E2", "#7DB5F0", "#A8D0F7"]
+BLUE_PALETTE = ["#7ec8f8", "#67b7eb", "#54a6dd", "#4597cf", "#3586bd", "#2a75a7"]
 LINE_COLORS = {
-    "risk": "#0B3D91",
-    "general": "#4A90E2",
+    "risk": "#7ec8f8",
+    "general": "#b7ddff",
     "baseline": "#9CA3AF",
-    "forecast": "#1F77D0",
+    "forecast": "#7ec8f8",
 }
 TRACKED_COMPANIES = {"openai", "anthropic", "google", "microsoft", "meta", "xai"}
 NON_COMPANY_VALUES = {"multiple", "general ai", "unknown", "other", "none", ""}
@@ -43,104 +43,196 @@ st.set_page_config(
 st.markdown(
     """
     <style>
+        :root {
+            --main-bg: #0f131a;
+            --sidebar-bg: #2a2d35;
+            --control-bg: #11161d;
+            --table-header: #1f222a;
+            --active-sidebar: #4b4e58;
+            --text: #f4f4f5;
+            --muted: #b9bec8;
+            --accent: #7ec8f8;
+            --grid: rgba(185, 190, 200, 0.16);
+        }
         .stApp {
-            background: #000000;
-            color: #E5E7EB;
+            background: var(--main-bg);
+            color: var(--text);
         }
         header[data-testid="stHeader"] {
-            background: #000000;
-            border-bottom: 1px solid #26334D;
+            background: var(--main-bg);
+            border-bottom: none;
         }
         header[data-testid="stHeader"] button,
         [data-testid="stToolbar"] button,
         [data-testid="stDecoration"],
         [data-testid="stStatusWidget"] {
-            color: #E5E7EB;
-            background: #000000;
+            color: var(--text);
+            background: var(--main-bg);
         }
         [data-testid="stToolbar"] {
-            background: #000000;
+            background: var(--main-bg);
         }
-        .block-container {padding-top: 2rem; padding-bottom: 3rem;}
+        [data-testid="stSidebar"] {
+            background: var(--sidebar-bg);
+        }
+        [data-testid="stSidebar"] > div {
+            background: var(--sidebar-bg);
+        }
+        [data-testid="stSidebar"] label,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] span {
+            color: var(--text) !important;
+            font-weight: 650;
+        }
+        [data-testid="stSidebar"] div[role="radiogroup"] label {
+            border-radius: 0.4rem;
+            margin: 0.2rem 0;
+            padding: 0.28rem 0.55rem;
+        }
+        [data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child {
+            display: none;
+        }
+        [data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+            background: var(--active-sidebar);
+        }
+        .block-container {
+            max-width: 1520px;
+            padding-top: 4.8rem;
+            padding-bottom: 4rem;
+            padding-left: 5rem;
+            padding-right: 5rem;
+        }
         h1, h2, h3, h4, h5, h6,
         h1 *, h2 *, h3 *, h4 *, h5 *, h6 * {
             color: #FFFFFF !important;
+            letter-spacing: 0;
+        }
+        h1 {
+            font-size: 3rem !important;
+            font-weight: 800 !important;
+            line-height: 1.08 !important;
+            margin-bottom: 1rem !important;
+        }
+        h2, h3 {
+            font-weight: 750 !important;
+            margin-top: 1.6rem !important;
         }
         p, li, span, label {
-            color: #E5E7EB;
+            color: var(--text);
         }
         div[data-testid="stMarkdownContainer"] p,
         div[data-testid="stCaptionContainer"],
         .small-note {
-            color: #9CA3AF;
+            color: var(--muted);
         }
         div[data-testid="stMetric"] {
-            background: #141A2A;
-            border: 1px solid #26334D;
-            border-radius: 0.5rem;
-            padding: 0.9rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0.2rem 0;
         }
         div[data-testid="stMetric"] label,
         div[data-testid="stMetric"] [data-testid="stMetricLabel"] {
-            color: #9CA3AF;
+            color: var(--muted);
         }
         div[data-testid="stMetric"] [data-testid="stMetricValue"] {
-            color: #E5E7EB;
+            color: var(--text);
+            font-weight: 750;
         }
-        .summary-card {
-            background: #141A2A;
-            border: 1px solid #26334D;
-            border-radius: 0.5rem;
-            color: #E5E7EB;
-            font-size: 1rem;
-            line-height: 1.55;
-            margin: 1rem 0 1.6rem 0;
-            padding: 1rem 1.15rem;
-        }
-        .insight-grid {
+        .hero-wrap {
+            align-items: center;
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 0.9rem;
-            margin: 0.25rem 0 1.6rem 0;
+            gap: 3rem;
+            grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.2fr);
+            margin-top: 1.5rem;
+            min-height: 460px;
         }
-        .insight-card {
-            background: #141A2A;
-            border: 1px solid #26334D;
-            border-left: 3px solid #4A90E2;
-            border-radius: 0.5rem;
-            padding: 0.9rem 1rem;
+        .hero-subtitle {
+            color: var(--text);
+            font-size: 1.08rem;
+            font-weight: 650;
+            line-height: 1.65;
+            margin: 1.2rem 0 1.8rem 0;
+            max-width: 660px;
         }
-        .insight-label {
-            color: #9CA3AF;
-            font-size: 0.78rem;
-            letter-spacing: 0.04em;
-            margin-bottom: 0.35rem;
-            text-transform: uppercase;
+        .coverage-line {
+            color: var(--muted);
+            font-size: 0.95rem;
+            font-weight: 650;
         }
-        .insight-value {
-            color: #E5E7EB;
-            font-size: 1.25rem;
-            font-weight: 700;
-            line-height: 1.2;
+        .image-placeholder {
+            align-items: center;
+            aspect-ratio: 16 / 9;
+            background:
+                radial-gradient(circle at 50% 40%, rgba(126, 200, 248, 0.15), transparent 28%),
+                linear-gradient(145deg, #05070a 0%, #0b1017 55%, #07090d 100%);
+            border: 1px solid rgba(185, 190, 200, 0.12);
+            border-radius: 0.55rem;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+            color: var(--muted);
+            display: flex;
+            justify-content: center;
+            min-height: 300px;
+            overflow: hidden;
+            width: 100%;
         }
-        .insight-detail {
-            color: #9CA3AF;
-            font-size: 0.88rem;
-            line-height: 1.35;
-            margin-top: 0.35rem;
+        .image-placeholder span {
+            color: var(--muted);
+            font-size: 0.95rem;
+            letter-spacing: 0;
+        }
+        .thin-divider {
+            border-top: 1px solid rgba(185, 190, 200, 0.24);
+            margin: 2.2rem 0 2rem 0;
+        }
+        .plain-two-col {
+            display: grid;
+            gap: 4rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .plain-two-col h3 {
+            font-size: 1.45rem !important;
+            margin-bottom: 1rem !important;
+        }
+        .plain-two-col p {
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.7;
+        }
+        .plain-two-col .muted {
+            color: var(--muted);
+            font-size: 0.92rem;
+            margin-top: 1.35rem;
+        }
+        .section-spacer {
+            height: 1.15rem;
+        }
+        div[data-testid="stSelectbox"] > div,
+        div[data-testid="stMultiSelect"] > div,
+        div[data-testid="stTextInput"] > div {
+            background: var(--control-bg);
         }
         div[data-testid="stDataFrame"] {
-            border: 1px solid #26334D;
-            border-radius: 0.5rem;
+            border: 1px solid rgba(185, 190, 200, 0.14);
+            border-radius: 0.35rem;
+            overflow: hidden;
+        }
+        div[data-testid="stDataFrame"] [role="columnheader"] {
+            background: var(--table-header) !important;
+            color: var(--text) !important;
         }
         @media (max-width: 900px) {
-            .insight-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+            .block-container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
             }
-        }
-        @media (max-width: 560px) {
-            .insight-grid {
+            .hero-wrap,
+            .plain-two-col {
                 grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 2.2rem !important;
             }
         }
     </style>
@@ -207,22 +299,22 @@ def filter_tracked_company_rows(df: pd.DataFrame, column: str) -> pd.DataFrame:
 def apply_dark_chart_theme(fig: go.Figure) -> go.Figure:
     """Apply the dashboard color system to Plotly figures."""
     fig.update_layout(
-        paper_bgcolor="#000000",
-        plot_bgcolor="#000000",
-        font={"color": "#E5E7EB"},
+        paper_bgcolor="#0f131a",
+        plot_bgcolor="#0f131a",
+        font={"color": "#f4f4f5"},
         title_font={"color": "#FFFFFF"},
-        legend={"font": {"color": "#E5E7EB"}},
+        legend={"font": {"color": "#f4f4f5"}},
         xaxis={
-            "gridcolor": "#26334D",
-            "linecolor": "#26334D",
-            "tickfont": {"color": "#9CA3AF"},
-            "title_font": {"color": "#9CA3AF"},
+            "gridcolor": "rgba(185, 190, 200, 0.16)",
+            "linecolor": "rgba(185, 190, 200, 0.22)",
+            "tickfont": {"color": "#b9bec8"},
+            "title_font": {"color": "#b9bec8"},
         },
         yaxis={
-            "gridcolor": "#26334D",
-            "linecolor": "#26334D",
-            "tickfont": {"color": "#9CA3AF"},
-            "title_font": {"color": "#9CA3AF"},
+            "gridcolor": "rgba(185, 190, 200, 0.16)",
+            "linecolor": "rgba(185, 190, 200, 0.22)",
+            "tickfont": {"color": "#b9bec8"},
+            "title_font": {"color": "#b9bec8"},
         },
     )
     return fig
@@ -277,57 +369,85 @@ for prediction_path in PREDICTION_FILES:
     prediction_error = candidate_error
 
 
-st.title("Public Sentiment of Frontier AI Labs")
-st.markdown("Let’s explore how the public feels about frontier Artificial Intelligence labs. Data pulled from Reddit and NewsAPI.")
-st.markdown(
-    """
-    <div class="summary-card">
-    This dashboard compares public AI sentiment across major frontier AI labs using
-    Reddit and NewsAPI records. It highlights which companies receive the strongest
-    risk-weighted sentiment, how sentiment changes over time, and how a simple
-    neural network forecast compares against a historical baseline.
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+def get_dataset_summary(df: pd.DataFrame | None) -> dict[str, str | None]:
+    """Build display-ready top-level metrics from the current record export."""
+    if df is None:
+        return {
+            "Collected records": None,
+            "Companies": None,
+            "Risk-labeled records": None,
+            "Avg sentiment": None,
+            "Avg risk sentiment": None,
+            "Coverage": None,
+        }
 
-st.markdown(
-    """
-    <div class="insight-grid">
-        <div class="insight-card">
-            <div class="insight-label">Highest Risk Sentiment</div>
-            <div class="insight-value">OpenAI</div>
-            <div class="insight-detail">0.391 avg risk-weighted sentiment</div>
-        </div>
-        <div class="insight-card">
-            <div class="insight-label">Most Discussed Company</div>
-            <div class="insight-value">OpenAI</div>
-            <div class="insight-detail">166 company-specific records</div>
-        </div>
-        <div class="insight-card">
-            <div class="insight-label">Risk-Labeled Records</div>
-            <div class="insight-value">614</div>
-            <div class="insight-detail">Records flagged by risk indicators</div>
-        </div>
-        <div class="insight-card">
-            <div class="insight-label">Dataset Coverage</div>
-            <div class="insight-value">Feb 2023 – Jul 2026</div>
-            <div class="insight-detail">Reddit + NewsAPI</div>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+    company_count = (
+        count_tracked_companies(df["company_or_topic"])
+        if "company_or_topic" in df.columns
+        else None
+    )
+    risk_labeled_records = (
+        int(pd.to_numeric(df["risk_label"], errors="coerce").fillna(0).sum())
+        if "risk_label" in df.columns
+        else None
+    )
+    avg_sentiment = (
+        pd.to_numeric(df["vader_compound"], errors="coerce").mean()
+        if "vader_compound" in df.columns
+        else None
+    )
+    avg_risk_sentiment = (
+        pd.to_numeric(df["record_risk_sentiment_score"], errors="coerce").mean()
+        if "record_risk_sentiment_score" in df.columns
+        else None
+    )
+    date_column = next(
+        (column for column in ["created_at", "date", "week"] if column in df.columns),
+        None,
+    )
+    date_range = format_date_range(df[date_column]) if date_column else None
 
-st.subheader("Which Frontier AI Labs Receive the Strongest Risk Signals?")
-st.caption(
-    "Risk-weighted sentiment combines sentiment score with keyword-based AI risk "
-    "indicators such as misinformation, privacy, cybersecurity, regulation, "
-    "copyright, reliability, and job displacement."
-)
-if company_df is None:
-    missing_data_message(company_error, "the company comparison chart")
-else:
+    return {
+        "Collected records": f"{len(df):,}",
+        "Companies": f"{company_count:,}" if company_count is not None else "Not available",
+        "Risk-labeled records": (
+            f"{risk_labeled_records:,}"
+            if risk_labeled_records is not None
+            else "Not available"
+        ),
+        "Avg sentiment": (
+            f"{avg_sentiment:.3f}" if pd.notna(avg_sentiment) else "Not available"
+        ),
+        "Avg risk sentiment": (
+            f"{avg_risk_sentiment:.3f}"
+            if pd.notna(avg_risk_sentiment)
+            else "Not available"
+        ),
+        "Coverage": f"{date_range[0]} to {date_range[1]}" if date_range else None,
+    }
+
+
+def render_metric_row(summary: dict[str, str | None]) -> None:
+    metric_columns = st.columns(5)
+    for column, label in zip(
+        metric_columns,
+        [
+            "Collected records",
+            "Companies",
+            "Risk-labeled records",
+            "Avg sentiment",
+            "Avg risk sentiment",
+        ],
+    ):
+        column.metric(label, summary.get(label) or "Not available")
+
+
+def render_company_risk_chart() -> None:
+    st.subheader("Average Risk-Weighted Sentiment by Company")
+    if company_df is None:
+        missing_data_message(company_error, "the company comparison chart")
+        return
+
     category_column = next(
         (
             column
@@ -342,11 +462,9 @@ else:
         "Risk-Labeled Record Volume by Company": "risk_records",
         "Total Record Volume by Company": "total_records",
     }
-    selected_title = None
     comparison_column = None
-    for title, column in comparison_candidates.items():
+    for column in comparison_candidates.values():
         if column in company_df.columns:
-            selected_title = title
             comparison_column = column
             break
 
@@ -374,8 +492,7 @@ else:
                     category_column: "Company",
                     comparison_column: "Average risk-weighted sentiment",
                 },
-                color=category_column,
-                color_discrete_sequence=BLUE_PALETTE,
+                color_discrete_sequence=[BLUE_PALETTE[0]],
             )
             comparison_chart.update_layout(showlegend=False)
             apply_dark_chart_theme(comparison_chart)
@@ -386,13 +503,20 @@ else:
         st.info("Data not available for this section.")
 
 
-st.subheader("How Public Sentiment Changes Over Time")
-if weekly_df is None:
-    missing_data_message(weekly_error, "the weekly trend chart")
-elif "week" not in weekly_df.columns:
-    st.info("Weekly trend data is not available.")
-else:
-    weekly_display = weekly_df.copy()
+def render_weekly_sentiment_chart(
+    source_df: pd.DataFrame | None = None,
+    error: str | None = None,
+    title: str = "Weekly Public Sentiment Trend",
+) -> None:
+    st.subheader(title)
+    if source_df is None:
+        missing_data_message(error, "the weekly trend chart")
+        return
+    if "week" not in source_df.columns:
+        st.info("Weekly trend data is not available.")
+        return
+
+    weekly_display = source_df.copy()
     weekly_display["week"] = pd.to_datetime(weekly_display["week"], errors="coerce")
     weekly_display = weekly_display.dropna(subset=["week"]).sort_values("week")
 
@@ -466,7 +590,7 @@ else:
                 )
             )
         weekly_chart.update_layout(
-            title="Weekly Public Sentiment Trend",
+            title=title,
             xaxis_title="Week",
             yaxis_title="Sentiment score",
             hovermode="x unified",
@@ -482,14 +606,17 @@ else:
         st.info("Weekly trend data is not available.")
 
 
-st.subheader("Discussion Volume by Company")
-if records_df is None:
-    missing_data_message(records_error, "the records-by-company chart")
-elif "company_or_topic" not in records_df.columns:
-    st.info("Data not available for this section.")
-else:
+def render_discussion_volume_chart(source_df: pd.DataFrame | None = None) -> None:
+    st.subheader("Discussion Volume by Company")
+    if source_df is None:
+        missing_data_message(records_error, "the records-by-company chart")
+        return
+    if "company_or_topic" not in source_df.columns:
+        st.info("Data not available for this section.")
+        return
+
     company_counts = (
-        filter_tracked_company_rows(records_df, "company_or_topic")["company_or_topic"]
+        filter_tracked_company_rows(source_df, "company_or_topic")["company_or_topic"]
         .fillna("Unknown")
         .value_counts()
         .rename_axis("company")
@@ -507,8 +634,7 @@ else:
             text_auto=True,
             title="Collected Records by Company",
             labels={"company": "Company", "records": "Collected records"},
-            color="company",
-            color_discrete_sequence=BLUE_PALETTE,
+            color_discrete_sequence=[BLUE_PALETTE[0]],
         )
         records_chart.update_layout(showlegend=False, yaxis={"autorange": "reversed"})
         apply_dark_chart_theme(records_chart)
@@ -516,10 +642,12 @@ else:
         st.caption("Record volume by company in the collected dataset.")
 
 
-st.subheader("Next-Week Risk Sentiment Forecast: Neural Network vs Historical Baseline")
-if prediction_df is None:
-    missing_data_message(prediction_error, "the forecast comparison chart")
-else:
+def render_forecast_chart() -> None:
+    st.subheader("Next-Week Risk Sentiment Forecast: Neural Network vs Historical Baseline")
+    if prediction_df is None:
+        missing_data_message(prediction_error, "the forecast comparison chart")
+        return
+
     forecast_columns = {
         "Actual next-week score": "actual_next_week_risk_score",
         "Historical mean baseline": "historical_mean_prediction",
@@ -590,11 +718,8 @@ else:
         st.info("Data not available for this section.")
 
 
-st.subheader("Recent Public Discussion")
-if records_df is None:
-    missing_data_message(records_error, "the recent-record sample")
-else:
-    recent_records = records_df.copy()
+def prepare_recent_records(source_df: pd.DataFrame) -> pd.DataFrame:
+    recent_records = source_df.copy()
     record_date_column = next(
         (
             column
@@ -610,6 +735,16 @@ else:
         recent_records = recent_records.sort_values(
             record_date_column, ascending=False, na_position="last"
         )
+    return recent_records
+
+
+def render_records_table(source_df: pd.DataFrame | None = None, limit: int | None = 5) -> None:
+    st.subheader("Recent Public Discussion")
+    if source_df is None:
+        missing_data_message(records_error, "the recent-record sample")
+        return
+
+    recent_records = prepare_recent_records(source_df)
 
     column_labels = {
         "created_at": "Date",
@@ -622,7 +757,10 @@ else:
     }
     visible_columns = [column for column in column_labels if column in recent_records.columns]
     if visible_columns:
-        display_sample = recent_records[visible_columns].head(5).rename(columns=column_labels)
+        display_sample = recent_records[visible_columns]
+        if limit is not None:
+            display_sample = display_sample.head(limit)
+        display_sample = display_sample.rename(columns=column_labels)
         column_config = {}
         if "Source" in display_sample.columns:
             column_config["Source"] = st.column_config.LinkColumn(
@@ -635,78 +773,235 @@ else:
             column_config=column_config,
         )
     else:
-        st.info("Showing the first 5 available rows.")
-        st.dataframe(recent_records.head(5), width="stretch", hide_index=True)
+        if limit is not None:
+            st.info(f"Showing the first {limit} available rows.")
+            recent_records = recent_records.head(limit)
+        st.dataframe(recent_records, width="stretch", hide_index=True)
 
 
-st.subheader("Dataset Summary")
-if records_df is None:
-    missing_data_message(records_error, "record-level KPI metrics")
-else:
-    metric_columns = st.columns(5)
-    metric_columns[0].metric("Collected records", f"{len(records_df):,}")
-
-    company_count = (
-        count_tracked_companies(records_df["company_or_topic"])
-        if "company_or_topic" in records_df.columns
-        else None
-    )
-    metric_columns[1].metric(
-        "Companies",
-        f"{company_count:,}" if company_count is not None else "Not available",
-    )
-
-    risk_labeled_records = (
-        int(pd.to_numeric(records_df["risk_label"], errors="coerce").fillna(0).sum())
-        if "risk_label" in records_df.columns
-        else None
-    )
-    metric_columns[2].metric(
-        "Risk-labeled records",
-        f"{risk_labeled_records:,}"
-        if risk_labeled_records is not None
-        else "Not available",
-    )
-
-    avg_sentiment = (
-        pd.to_numeric(records_df["vader_compound"], errors="coerce").mean()
-        if "vader_compound" in records_df.columns
-        else None
-    )
-    metric_columns[3].metric(
-        "Avg sentiment",
-        f"{avg_sentiment:.3f}" if pd.notna(avg_sentiment) else "Not available",
-    )
-
-    avg_risk_sentiment = (
-        pd.to_numeric(records_df["record_risk_sentiment_score"], errors="coerce").mean()
-        if "record_risk_sentiment_score" in records_df.columns
-        else None
-    )
-    metric_columns[4].metric(
-        "Avg risk sentiment",
-        f"{avg_risk_sentiment:.3f}"
-        if pd.notna(avg_risk_sentiment)
-        else "Not available",
-    )
-
-    date_column = next(
-        (column for column in ["created_at", "date", "week"] if column in records_df.columns),
-        None,
-    )
-    date_range = format_date_range(records_df[date_column]) if date_column else None
-    if date_range:
-        st.caption(f"Available record dates: {date_range[0]} to {date_range[1]}.")
+def render_dataset_summary(source_df: pd.DataFrame | None = None) -> None:
+    st.subheader("Dataset Summary")
+    if source_df is None:
+        missing_data_message(records_error, "record-level KPI metrics")
+        return
+    summary = get_dataset_summary(source_df)
+    render_metric_row(summary)
+    if summary.get("Coverage"):
+        st.caption(f"Available record dates: {summary['Coverage']}.")
 
 
-st.subheader("Project Summary")
-st.markdown(
-    """
-    - Collected AI-related public discussion from Reddit and NewsAPI covering OpenAI, Anthropic, Google, Microsoft, Meta, and xAI.
-    - Applied VADER sentiment scoring and text-derived features to measure public perception of frontier AI labs.
-    - Labeled risk-related discussion using keyword-based indicators for misinformation, privacy, cybersecurity, regulation, reliability, copyright, and job displacement.
-    - Aggregated records into weekly company-level sentiment trends and discussion-volume metrics.
-    - Trained a feedforward neural network to forecast next-week AI risk sentiment and compared results against a historical mean baseline.
-    - Built an interactive Streamlit dashboard to explore company sentiment, risk exposure, public discussion volume, weekly trends, and forecasting results.
-    """
-)
+def render_landing_page() -> None:
+    summary = get_dataset_summary(records_df)
+    coverage = summary.get("Coverage") or "Coverage not available"
+    st.markdown(
+        f"""
+        <div class="hero-wrap">
+            <div>
+                <h1>Public Sentiment of Frontier AI Labs</h1>
+                <div class="hero-subtitle">
+                    A machine learning dashboard for analyzing public AI risk sentiment
+                    across major frontier AI labs using Reddit and NewsAPI records.
+                </div>
+                <div class="coverage-line">Dataset coverage: {coverage} · Reddit + NewsAPI</div>
+            </div>
+            <div class="image-placeholder">
+                <span>AI-themed image placeholder</span>
+            </div>
+        </div>
+        <div class="thin-divider"></div>
+        <div class="plain-two-col">
+            <div>
+                <h3>What It Does</h3>
+                <p>
+                    Collects AI-related public discussion, scores sentiment, labels
+                    risk-related records, and summarizes how public perception differs
+                    across frontier AI labs.
+                </p>
+                <p class="muted">
+                    The dashboard focuses on public discussion signals, not objective
+                    measurements of company safety or technical risk.
+                </p>
+            </div>
+            <div>
+                <h3>Method</h3>
+                <p>
+                    Uses VADER sentiment, keyword-based AI risk indicators, weekly
+                    aggregation, and a feedforward neural network forecast compared
+                    against a historical mean baseline.
+                </p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_overview_dashboard() -> None:
+    st.title("Overview Dashboard")
+    if records_df is None:
+        missing_data_message(records_error, "record-level KPI metrics")
+    else:
+        render_metric_row(get_dataset_summary(records_df))
+        st.markdown('<div class="section-spacer"></div>', unsafe_allow_html=True)
+
+    render_company_risk_chart()
+    render_discussion_volume_chart(records_df)
+    render_weekly_sentiment_chart(weekly_df, weekly_error, "Weekly Public Sentiment Trend")
+    render_dataset_summary(records_df)
+
+
+def render_company_explorer() -> None:
+    st.title("Company Explorer")
+    if records_df is None or "company_or_topic" not in records_df.columns:
+        missing_data_message(records_error, "company-level records")
+        return
+
+    company_options = sorted(
+        value
+        for value in records_df["company_or_topic"].dropna().astype(str).unique()
+        if value.strip().lower() in TRACKED_COMPANIES
+    )
+    if not company_options:
+        st.info("Company-specific records are not available.")
+        return
+
+    selected_company = st.selectbox("Company", company_options)
+    company_records = records_df[
+        records_df["company_or_topic"].astype(str).str.lower() == selected_company.lower()
+    ].copy()
+    st.markdown('<div class="section-spacer"></div>', unsafe_allow_html=True)
+    render_metric_row(get_dataset_summary(company_records))
+
+    left, right = st.columns(2)
+    if "risk_label" in company_records.columns:
+        risk_counts = (
+            pd.to_numeric(company_records["risk_label"], errors="coerce")
+            .fillna(0)
+            .astype(int)
+            .map({0: "Not risk-labeled", 1: "Risk-labeled"})
+            .value_counts()
+            .rename_axis("label")
+            .reset_index(name="records")
+        )
+        risk_chart = px.bar(
+            risk_counts,
+            x="label",
+            y="records",
+            title=f"{selected_company} Risk-Labeled Records",
+            labels={"label": "", "records": "Records"},
+            color_discrete_sequence=[BLUE_PALETTE[0]],
+        )
+        apply_dark_chart_theme(risk_chart)
+        left.plotly_chart(risk_chart, width="stretch")
+
+    if "source" in company_records.columns:
+        source_counts = (
+            company_records["source"]
+            .fillna("Unknown")
+            .map(format_source_name)
+            .value_counts()
+            .rename_axis("source")
+            .reset_index(name="records")
+        )
+        source_chart = px.bar(
+            source_counts,
+            x="source",
+            y="records",
+            title=f"{selected_company} Records by Source",
+            labels={"source": "", "records": "Records"},
+            color_discrete_sequence=[BLUE_PALETTE[0]],
+        )
+        apply_dark_chart_theme(source_chart)
+        right.plotly_chart(source_chart, width="stretch")
+
+    if {"week", "vader_compound", "record_risk_sentiment_score"}.issubset(
+        company_records.columns
+    ):
+        weekly_company = company_records.copy()
+        weekly_company["week"] = pd.to_datetime(weekly_company["week"], errors="coerce")
+        weekly_company = weekly_company.dropna(subset=["week"])
+        weekly_company = (
+            weekly_company.groupby("week", as_index=False)
+            .agg(
+                total_records=("week", "size"),
+                avg_sentiment=("vader_compound", "mean"),
+                risk_sentiment_score=("record_risk_sentiment_score", "mean"),
+            )
+            .sort_values("week")
+        )
+        render_weekly_sentiment_chart(
+            weekly_company,
+            None,
+            f"{selected_company} Weekly Public Sentiment Trend",
+        )
+
+    render_records_table(company_records, limit=8)
+
+
+def render_forecast_explorer() -> None:
+    st.title("Forecast Explorer")
+    render_forecast_chart()
+    st.caption(
+        "The forecast compares the feedforward neural network against a historical "
+        "mean baseline using weekly sentiment features."
+    )
+
+
+def render_records_explorer() -> None:
+    st.title("Records Explorer")
+    if records_df is None:
+        missing_data_message(records_error, "the recent-record sample")
+        return
+
+    filtered_records = records_df.copy()
+    filter_columns = st.columns(3)
+    if "company_or_topic" in filtered_records.columns:
+        company_options = sorted(
+            filtered_records["company_or_topic"].dropna().astype(str).unique()
+        )
+        selected_companies = filter_columns[0].multiselect(
+            "Company", company_options, default=[]
+        )
+        if selected_companies:
+            filtered_records = filtered_records[
+                filtered_records["company_or_topic"].astype(str).isin(selected_companies)
+            ]
+    if "source" in filtered_records.columns:
+        source_options = sorted(filtered_records["source"].dropna().astype(str).unique())
+        selected_sources = filter_columns[1].multiselect("Source", source_options, default=[])
+        if selected_sources:
+            filtered_records = filtered_records[
+                filtered_records["source"].astype(str).isin(selected_sources)
+            ]
+    if "risk_label" in filtered_records.columns:
+        risk_filter = filter_columns[2].selectbox(
+            "Risk label", ["All", "Risk-labeled", "Not risk-labeled"]
+        )
+        risk_values = pd.to_numeric(filtered_records["risk_label"], errors="coerce").fillna(0)
+        if risk_filter == "Risk-labeled":
+            filtered_records = filtered_records[risk_values == 1]
+        elif risk_filter == "Not risk-labeled":
+            filtered_records = filtered_records[risk_values == 0]
+
+    render_records_table(filtered_records, limit=None)
+
+
+pages = [
+    "app",
+    "Overview Dashboard",
+    "Company Explorer",
+    "Forecast Explorer",
+    "Records Explorer",
+]
+page = st.sidebar.radio("Navigation", pages, label_visibility="collapsed")
+
+if page == "app":
+    render_landing_page()
+elif page == "Overview Dashboard":
+    render_overview_dashboard()
+elif page == "Company Explorer":
+    render_company_explorer()
+elif page == "Forecast Explorer":
+    render_forecast_explorer()
+elif page == "Records Explorer":
+    render_records_explorer()
